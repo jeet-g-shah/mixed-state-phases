@@ -405,108 +405,7 @@ function check_positivity_multiple(ρ, χ=2, N=100, ϵ=1e-10)
     return true
 end 
 
-function L01( i, proj=[p00, p01, p10, p11, ppp, pmm], coeff=1)
-    if coeff != 0.0
-        println("L0 old might have a bug. Check odd symmetry")
-    end
-    os = OpSum()
-    p00, p01, p10, p11, ppp, pmm = proj
-    # Applies the opreator on sites (i-1)L, (i-1)R, iL, iR, (i+1)L, (i+1)R
-    # The same as 2i-3, 2i-2, 2i-1, 2i, 2i+1, 2i+2
-    
-    # Terms below add L_0^1 ⊗ (L_0^1)^*
-    os += coeff, p00, 2*i-3, p00, 2*i-2, ppp, 2*i-1, ppp, 2*i, p01, 2*i+1, p01, 2*i+2
-    os += coeff, p00, 2*i-3, p01, 2*i-2, ppp, 2*i-1, ppp, 2*i, p01, 2*i+1, p00, 2*i+2
-    os += coeff, p01, 2*i-3, p00, 2*i-2, ppp, 2*i-1, ppp, 2*i, p00, 2*i+1, p01, 2*i+2
-    os += coeff, p01, 2*i-3, p01, 2*i-2, ppp, 2*i-1, ppp, 2*i, p00, 2*i+1, p00, 2*i+2
-    
-    # Terms below add -1/2 (L_0^1^\dagger L_0^1) ⊗ I --> Operates only on L <=> odd
-    os += -1/2*coeff, p00, 2*i-3, ppp, 2*i-1, p11, 2*i+1
-    os += -1/2*coeff, p01, 2*i-3, ppp, 2*i-1, p10, 2*i+1
-    os += -1/2*coeff, p10, 2*i-3, ppp, 2*i-1, p01, 2*i+1
-    os += -1/2*coeff, p11, 2*i-3, ppp, 2*i-1, p00, 2*i+1
-    
-    # Terms below add -1/2  I ⊗ (L_0^1^\dagger L_0^1)^T --> Operates only on R <=> even
-    os += -1/2*coeff, p00, 2*(i-1), ppp, 2*i, p11, 2*(i+1)
-    os += -1/2*coeff, p10, 2*(i-1), ppp, 2*i, p01, 2*(i+1)
-    os += -1/2*coeff, p01, 2*(i-1), ppp, 2*i, p10, 2*(i+1)
-    os += -1/2*coeff, p11, 2*(i-1), ppp, 2*i, p00, 2*(i+1)
-    return os
-end
 
-function L02(i, proj=[p00, p01, p10, p11, ppp, pmm], coeff=1)
-    os = OpSum()
-    p00, p01, p10, p11, ppp, pmm = proj
-    # Applies the opreator on sites (i-1)L, (i-1)R, iL, iR, (i+1)L, (i+1)R
-    # The same as 2i-3, 2i-2, 2i-1, 2i, 2i+1, 2i+2
-    os +=  coeff, p10, 2*i-3, p10, 2*i-2, ppp, 2*i-1, ppp, 2*i, p11, 2*i+1, p11, 2*i+2
-    os += -coeff, p10, 2*i-3, p11, 2*i-2, ppp, 2*i-1, ppp, 2*i, p11, 2*i+1, p10, 2*i+2
-    os += -coeff, p11, 2*i-3, p10, 2*i-2, ppp, 2*i-1, ppp, 2*i, p10, 2*i+1, p11, 2*i+2
-    os +=  coeff, p11, 2*i-3, p11, 2*i-2, ppp, 2*i-1, ppp, 2*i, p10, 2*i+1, p10, 2*i+2
-    
-    # Terms below add -1/2 (L_0^2^\dagger L_0^2) ⊗ I --> Operates only on L <=> odd
-    os += -1/2*coeff, p00, 2*i-3, ppp, 2*i-1, p11, 2*i+1
-    os +=  1/2*coeff, p01, 2*i-3, ppp, 2*i-1, p10, 2*i+1
-    os +=  1/2*coeff, p10, 2*i-3, ppp, 2*i-1, p01, 2*i+1
-    os += -1/2*coeff, p11, 2*i-3, ppp, 2*i-1, p00, 2*i+1
-    
-    # Terms below add -1/2  I ⊗ (L_0^2^\dagger L_0^2)^T --> Operates only on R <=> even
-    os += -1/2*coeff, p00, 2*(i-1), ppp, 2*i, p11, 2*(i+1)
-    os +=  1/2*coeff, p10, 2*(i-1), ppp, 2*i, p01, 2*(i+1)
-    os +=  1/2*coeff, p01, 2*(i-1), ppp, 2*i, p10, 2*(i+1)
-    os += -1/2*coeff, p11, 2*(i-1), ppp, 2*i, p00, 2*(i+1)
-    
-    return os
-end
-
-function L03(i, proj=[p00, p01, p10, p11, ppp, pmm], coeff=1)
-    os = OpSum()
-    p00, p01, p10, p11, ppp, pmm = proj
-    # Applies the opreator on sites (i-1)L, (i-1)R, iL, iR, (i+1)L, (i+1)R
-    # The same as 2i-3, 2i-2, 2i-1, 2i, 2i+1, 2i+2
-    os += coeff, p00, 2*i-3, p00, 2*i-2, pmm, 2*i-1, pmm, 2*i, p10, 2*i+1, p10, 2*i+2
-    os += coeff, p00, 2*i-3, p01, 2*i-2, pmm, 2*i-1, pmm, 2*i, p10, 2*i+1, p11, 2*i+2
-    os += coeff, p01, 2*i-3, p00, 2*i-2, pmm, 2*i-1, pmm, 2*i, p11, 2*i+1, p10, 2*i+2
-    os += coeff, p01, 2*i-3, p01, 2*i-2, pmm, 2*i-1, pmm, 2*i, p11, 2*i+1, p11, 2*i+2
-    
-    # Terms below add -1/2 (L_0^3^\dagger L_0^3) ⊗ I --> Operates only on L <=> odd
-    os += -1/2*coeff, p00, 2*i-3, pmm, 2*i-1, p00, 2*i+1
-    os += -1/2*coeff, p01, 2*i-3, pmm, 2*i-1, p01, 2*i+1
-    os += -1/2*coeff, p10, 2*i-3, pmm, 2*i-1, p10, 2*i+1
-    os += -1/2*coeff, p11, 2*i-3, pmm, 2*i-1, p11, 2*i+1
-    
-    # Terms below add -1/2  I ⊗ (L_0^3^\dagger L_0^3)^T --> Operates only on R <=> even
-    os += -1/2*coeff, p00, 2*(i-1), pmm, 2*i, p00, 2*(i+1)
-    os += -1/2*coeff, p10, 2*(i-1), pmm, 2*i, p10, 2*(i+1)
-    os += -1/2*coeff, p01, 2*(i-1), pmm, 2*i, p01, 2*(i+1)
-    os += -1/2*coeff, p11, 2*(i-1), pmm, 2*i, p11, 2*(i+1)
-    
-    return os
-end
-
-function L04(i, proj=[p00, p01, p10, p11, ppp, pmm], coeff=1)
-    os = OpSum()
-    p00, p01, p10, p11, ppp, pmm = proj
-    # Applies the opreator on sites (i-1)L, (i-1)R, iL, iR, (i+1)L, (i+1)R
-    # The same as 2i-3, 2i-2, 2i-1, 2i, 2i+1, 2i+2
-    os +=  coeff, p10, 2*i-3, p10, 2*i-2, pmm, 2*i-1, pmm, 2*i, p00, 2*i+1, p00, 2*i+2
-    os += -coeff, p10, 2*i-3, p11, 2*i-2, pmm, 2*i-1, pmm, 2*i, p00, 2*i+1, p01, 2*i+2
-    os += -coeff, p11, 2*i-3, p10, 2*i-2, pmm, 2*i-1, pmm, 2*i, p01, 2*i+1, p00, 2*i+2
-    os +=  coeff, p11, 2*i-3, p11, 2*i-2, pmm, 2*i-1, pmm, 2*i, p01, 2*i+1, p01, 2*i+2
-    
-    # Terms below add -1/2 (L_0^4^\dagger L_0^4) ⊗ I --> Operates only on L <=> odd
-    os += -1/2*coeff, p00, 2*i-3, pmm, 2*i-1, p00, 2*i+1
-    os +=  1/2*coeff, p01, 2*i-3, pmm, 2*i-1, p01, 2*i+1
-    os +=  1/2*coeff, p10, 2*i-3, pmm, 2*i-1, p10, 2*i+1
-    os += -1/2*coeff, p11, 2*i-3, pmm, 2*i-1, p11, 2*i+1
-    
-    # Terms below add -1/2  I ⊗ (L_0^4^\dagger L_0^4)^T --> Operates only on R <=> even
-    os += -1/2*coeff, p00, 2*(i-1), pmm, 2*i, p00, 2*(i+1)
-    os +=  1/2*coeff, p10, 2*(i-1), pmm, 2*i, p10, 2*(i+1)
-    os +=  1/2*coeff, p01, 2*(i-1), pmm, 2*i, p01, 2*(i+1)
-    os += -1/2*coeff, p11, 2*(i-1), pmm, 2*i, p11, 2*(i+1)
-    return os
-end
 
 # Convention for choosing sites:
 # 1 , 2 , 3 , 4 , 5 , 6 , ... ,2N-1, 2N 
@@ -829,115 +728,6 @@ function H_two_site(i, CL_pert, op1, op2)
     return os
 end
 
-function get_lind(sites, coeff = [1,0,0,0,0,0,1,1,0,0,0,0], pbc = false, bc_weak = false, bc_strong = false)
-    # N is the Number of spins
-    CL0, CL3, CLx_odd, CLx_even, CLz_odd, CLz_even, CL1, CL2, CL0_old, CLzz, CL0_left, CL0_dual, CL1_dual, CL2_dual, CL_pert = coeff
-    # sites = siteinds("S=1/2",2*N)
-    N = length(sites) ÷ 2
-    os = OpSum()
-
-
-    # println("WARNING: Using simplified Lindbladian")
-    for i in 2:2:N-1
-        # os += L0_plus(i, CL0) 
-        os += L0_minus(i, CL0)
-        os += L0_dual(i, CL0_dual)
-        # os += L0_minus_left(i, CL0_left)
-    end
-    # for i in 3:2:N-1
-    #     os += L3(i, proj,1, CL3) 
-    #     os += L3(i, proj,-1, CL3)
-    # end
-
-    for i in 1:2:N
-        os += L1(i, CL1)
-        os += L1_dual(i, CL1_dual)
-    end
-    # println("Using L2 from paper")
-    for i in 3:2:N-1
-        os += L2_paper(i, proj, CL2) 
-        os += L2_paper_dual(i, proj, CL2_dual) 
-    end
-    # for i in [N]
-    #     os += Lx(i, CL_pert) 
-    # end
-
-    # for i in 1:2:N
-    #     # os += Lx(i, CLx_odd) 
-    #     os += L_one_site(i, p10, CL_pert)
-    # end
-    # for i in 2:2:N
-    #     os += Lx(i, CLx_even) 
-    # end
-    # for i in 1:2:N
-    #     os += Lz(i, CLz_odd) 
-    # end
-    # for i in 2:2:N
-    #     os += Lz(i, CLz_even) 
-    # end
-    for i in 2:2:N-2
-        os += Lzz(i, CL_pert) 
-    end
-    # for i in 2:2:N-1
-    #     os += L01(i, proj, CL0_old) 
-    #     os += L02(i, proj, CL0_old)
-    #     os += L03(i, proj, CL0_old) 
-    #     os += L04(i, proj, CL0_old)
-    # end
-    # for i in 1:2:N-2
-    #     os += L_two_site(i, p00, p01, CL_pert)
-    #     os += L_two_site(i, p11, p10, CL_pert)
-    # end
-    # for i in 2:2:N-2
-    #     os += L_two_site(i, Z, Z, CL_pert)
-    # end
-    # for i in 2:2:N-2
-    #     os += L_three_site(i,Z, X, Z, CL_pert)
-    # end
-    # for i in 2:2:N-3
-    #     os += L_four_site(i, Z, Z, Y, Z, CL_pert)
-    #     os += L_four_site(i, Z, X, X, Z, 1.5*CL_pert)
-    # end
-    # for i in 1:4:N-2
-    #     os += L_weak_1(i, proj, CL_pert)
-    # end
-    # for i in 2:2:N-2
-    #     os += L_two_site(i,pmp,pmp,  CL_pert)
-    # end
-    # for i in 1:2:N
-    #     os += Hx(i, CL_pert)
-    # end
-    # for i in 2:2:N-2
-    #     os += Hzz(i, CL_pert)
-    # end
-    # for i in 1:2:N-2
-    #     os += H_two_site(i, CL_pert, X, X)
-    # end
-
-    if pbc == true
-        println("Implementing PBC")
-        os += Lpbc(N, CL0, CL1, CL2, proj)
-    end
-    if bc_weak == true
-        println("Implementing Weak twisted BC")
-        os += Lbc_weak(N, CL0, CL1, CL2, proj)
-    end
-    if bc_strong == true
-        println("Implementing Strong twisted BC")
-        os += Lbc_strong(N, CL0, CL1, CL2, proj)
-    end
-
-    # Make MPOs
-
-    lind = MPO(os, sites);
-    # lind_dag =  dag(swapprime(lind,0,1))
-    # ldl = apply(lind_dag, lind);
-    lind_dag = nothing 
-    ldl = nothing
-    println("Maximum bond dimension of Lindbladian = ", maximum(linkdims(lind)))
-    # println("Maximum bond dimension of L^† L = ", maximum(linkdims(ldl)))
-    return lind, ldl, lind_dag
-end 
 
 # ---------------------- Writing/Reading functions -------------------------
 function saveMPS(filename, energy_super_list, state_super_list)
@@ -974,53 +764,9 @@ end
 
 dagger(operator) = dag(swapprime(operator,0,1))
 
-function get_V(state, symm)
-    T1 = state[1]
-    sites = siteinds(state)
-    links = linkinds(state)
-    T1_star = ITensor(conj.(Array(state[1], sites[1], links[1])), sites[1]', links[1]')
-    U1 = ITensor(symm[1], sites[1], sites[1]')
-    V1 = T1*U1*T1_star
-    V_list = [V1]
-    N = length(state)
-    for i in 2:N-1
-        Ti = state[i]
-        Ti_star = ITensor(conj.(Array(state[i], sites[i], links[i-1], links[i])), sites[i]', links[i-1]', links[i]')
-        Ui = ITensor(symm[i], sites[i], sites[i]')
-        Vi = V_list[end] * Ui * Ti * Ti_star
-        push!(V_list, Vi)
-    end
-    return V_list
-end
 
 
-function indicator_mixed(psi_1, j)
-    N = length(psi_1)
-    links = linkinds(psi_1)
-    s = siteinds(psi_1)
-    psi_dmrg = psi_1
-    psi_dmrg = psi_dmrg/norm(psi_dmrg)
 
-    orthogonalize!(psi_dmrg, N);
-
-    oplist_weak = [i%4 == 1 || i%4 == 2 ? X : Id for i in 1:N]
-    oplist_strong_left = [i%4 == 3 ? X : Id for i in 1:N]
-    oplist_strong_right = [i%4 == 0 ? X : Id for i in 1:N]
-
-    Vweak = get_V(psi_dmrg, oplist_weak)
-    Vstrong_left = get_V(psi_dmrg, oplist_strong_left);
-    Vstrong_right = get_V(psi_dmrg, oplist_strong_right);
-
-    Vweak_matrix = Array(Vweak[j], inds(Vweak[j]))
-    Vstrong_left_matrix = Array(Vstrong_left[j], inds(Vstrong_left[j]))
-    Vstrong_right_matrix = Array(Vstrong_right[j], inds(Vstrong_right[j]))
-
-    invariant_wsl = inv(Vweak_matrix) *inv(Vstrong_left_matrix) * Vweak_matrix  * Vstrong_left_matrix
-    invariant_wsr = inv(Vweak_matrix) *inv(Vstrong_right_matrix) * Vweak_matrix  * Vstrong_right_matrix
-    invariant_ss = inv(Vstrong_left_matrix) *inv(Vstrong_right_matrix) * Vstrong_left_matrix  * Vstrong_right_matrix
-
-    return tr(invariant_wsl)/size(invariant_wsl)[1], tr(invariant_wsr)/size(invariant_wsr)[1] , tr(invariant_ss)/size(invariant_ss)[1] 
-end
 
 function weak_string_correlator(state::MPS, n::Int64, m::Int64)
     # Weak 1-copy string correlator. 
@@ -1459,21 +1205,7 @@ function change_sites(ρ, new_sites)
     return psi
 end
 
-function cij_slow(ψ::MPS,i::Int64, j::Int64,  ρma_tilde::MPS)
-    # ψ =ψ/traceMPS(ψ)
-    # ρma = ρma/traceMPS(ρma)
-    new_state = apply_op(ψ, Z, 2i-1)
-    new_state = apply_op(new_state, Z, 2i)
-    new_state = apply_op(new_state, Z, 2j-1)
-    new_state = apply_op(new_state, Z, 2j)
-    # swp = swapMPO(siteinds(ψ))
-    
-    # numerator = inner(ρma_tilde', swp, new_state)
-    numerator = inner(ρma_tilde, new_state)
-    # denominator = inner(ρma_tilde, ψ)
-    # denominator = inner(ρma_tilde', swp, ψ)
-    return numerator
-end
+
 
 function apply_Z!(ψ::MPS, s::Vector{Index{Int64}}, i::Int64)
     op_tensor = ITensor(Z, s[i], s[i]')
@@ -1491,37 +1223,4 @@ function cij_fast(ψ::MPS,i::Int64, j::Int64,  ρma_tilde::MPS)
     state = apply_Z!(state, s, 2j-1)
     state = apply_Z!(state, s, 2j)
     return inner(ψ, state)
-end
-
-function αi(ψ::MPS,i::Int64, ρma_tilde::MPS)
-    state = deepcopy(ρma_tilde)
-    s = siteinds(state)
-    state = apply_Z!(state, s, 2i)
-    state = apply_Z!(state, s, 2(i+2))
-    return inner(ψ, state)
-end
-
-function generate_cij(state1::MPS, state2::MPS)
-    # state1 is ρma_tilde
-    psi = plusplus_project(state2)
-    cij_mat = fill(0.0+0.0im, length(psi)÷4,length(psi)÷4)
-    psi = psi/norm(psi)
-    ρma_tilde = plusplus_project(state1)
-    ρma_tilde = change_sites(ρma_tilde, siteinds(state2))
-    ρma_tilde = ρma_tilde / norm(ρma_tilde)
-    s = siteinds(ρma_tilde)
-    # temp2 =  []
-    for i in 1:length(psi)÷4-1
-        for j in i+1:length(psi)÷4
-            state = deepcopy(ρma_tilde)
-            state = apply_Z!(state, s, 4i-1)
-            state = apply_Z!(state, s, 4i)
-            state = apply_Z!(state, s, 4j-1)
-            state = apply_Z!(state, s, 4j)
-            state=state/norm(state)
-            cij_mat[i,j] = inner(state, psi )
-            # push!(temp2, cij_mat[i,j])
-        end
-    end
-    return cij_mat, inner(ρma_tilde, psi)
 end
